@@ -1,5 +1,5 @@
 <div class="page-select" ng-if="$pagination.showPageSelect()">
-  <div class="label">{{$pagination.label.page}}</div>
+  <div class="label">{{$pagination.$label.page}}</div>
 
   <md-select virtual-page-select total="{{$pagination.pages()}}" class="md-table-select" ng-model="$pagination.page" md-container-class="md-pagination-select" ng-change="$pagination.onPaginationChange()" ng-disabled="$pagination.disabled" aria-label="Page">
     <md-content>
@@ -9,7 +9,7 @@
 </div>
 
 <div class="limit-select" ng-if="$pagination.limitOptions">
-  <div class="label">{{$pagination.label.rowsPerPage}}</div>
+  <div class="label">{{$pagination.$label.rowsPerPage}}</div>
 
   <md-select class="md-table-select" ng-model="$pagination.limit" md-container-class="md-pagination-select" ng-disabled="$pagination.disabled" aria-label="Rows" placeholder="{{ $pagination.limitOptions[0] }}">
     <md-option ng-repeat="option in $pagination.limitOptions" ng-value="option.value ? $pagination.eval(option.value) : option">{{::option.label ? option.label : option}}</md-option>
@@ -17,7 +17,7 @@
 </div>
 
 <div class="buttons">
-  <div class="label">{{$pagination.min()}} - {{$pagination.max()}} {{$pagination.label.of}} {{$pagination.total}}</div>
+  <div class="label">{{$pagination.min()}} - {{$pagination.max()}} {{$pagination.$label.of}} {{$pagination.total}}</div>
 
   <md-button class="md-icon-button" type="button" ng-if="$pagination.showBoundaryLinks()" ng-click="$pagination.first()" ng-disabled="$pagination.disabled || !$pagination.hasPrevious()" aria-label="First">
     <md-icon md-svg-icon="navigate-first.svg"></md-icon>

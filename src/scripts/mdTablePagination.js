@@ -69,7 +69,7 @@ function mdTablePagination() {
     };
 
     self.onPaginationChange = function () {
-      if(angular.isFunction(self.onPaginate)) {
+      if (angular.isFunction(self.onPaginate)) {
         $mdUtil.nextTick(function () {
           self.onPaginate(self.page, self.limit);
         });
@@ -94,7 +94,7 @@ function mdTablePagination() {
     };
 
     $scope.$watch('$pagination.limit', function (newValue, oldValue) {
-      if(isNaN(newValue) || isNaN(oldValue) || newValue === oldValue) {
+      if (isNaN(newValue) || isNaN(oldValue) || newValue === oldValue) {
         return;
       }
 
@@ -104,11 +104,11 @@ function mdTablePagination() {
     });
 
     $scope.$watch('$pagination.total', function (newValue, oldValue) {
-      if(isNaN(newValue) || newValue === oldValue) {
+      if (isNaN(newValue) || newValue === oldValue) {
         return;
       }
 
-      if(self.page > self.pages()) {
+      if (self.page > self.pages()) {
         self.last();
       }
     });
@@ -125,7 +125,7 @@ function mdTablePagination() {
       page: '=mdPage',
       pageSelect: '=?mdPageSelect',
       onPaginate: '=?mdOnPaginate',
-      limitOptions: '=?mdLimitOptions',
+      limitOptions: '=?mdOptions',
       total: '@mdTotal'
     },
     compile: compile,
