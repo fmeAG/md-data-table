@@ -8,7 +8,7 @@ function mdTablePagination() {
     tElement.addClass('md-table-pagination');
   }
 
-  function Controller($attrs, $scope) {
+  function Controller($attrs, $mdUtil, $scope) {
     var self = this;
 
     function updateTranslations() {
@@ -22,7 +22,7 @@ function mdTablePagination() {
     $scope.$watch('$pagination.label', updateTranslations);
 
     function isPositive(number) {
-      return number > 0;
+      return parseInt(number, 10) > 0;
     }
 
     function isZero(number) {
@@ -31,6 +31,10 @@ function mdTablePagination() {
 
     self.disableNext = function () {
       return isZero(self.limit) || !self.hasNext();
+    }
+
+    self.eval = function (expression) {
+      return $scope.$eval(expression);
     };
 
     self.first = function () {
@@ -56,7 +60,7 @@ function mdTablePagination() {
     };
 
     self.min = function () {
-      return self.page * self.limit - self.limit;
+      return isPositive(self.total) ? self.page * self.limit - self.limit + 1 : 0;
     };
 
     self.next = function () {
@@ -66,12 +70,14 @@ function mdTablePagination() {
 
     self.onPaginationChange = function () {
       if(angular.isFunction(self.onPaginate)) {
-        self.onPaginate(self.page, self.limit);
+        $mdUtil.nextTick(function () {
+          self.onPaginate(self.page, self.limit);
+        });
       }
     };
 
     self.pages = function () {
-      return Math.ceil(self.total / (isZero(self.limit) ? 1 : self.limit));
+      return isPositive(self.total) ? Math.ceil(self.total / (isPositive(self.limit) ? self.limit : 1)) : 1;
     };
 
     self.previous = function () {
@@ -79,48 +85,47 @@ function mdTablePagination() {
       self.onPaginationChange();
     };
 
-    self.range = function (total) {
-      return new Array(isFinite(total) && isPositive(total) ? total : 1);
-    };
-
     self.showBoundaryLinks = function () {
-      if($attrs.hasOwnProperty('mdBoundaryLinks') && $attrs.mdBoundaryLinks === '') {
-        return true;
-      }
-
-      return self.boundaryLinks;
+      return $attrs.mdBoundaryLinks === '' || self.boundaryLinks;
     };
 
     self.showPageSelect = function () {
-      if($attrs.hasOwnProperty('mdPageSelect') && $attrs.mdPageSelect === '') {
-        return true;
-      }
-
-      return self.pageSelect;
+      return $attrs.mdPageSelect === '' || self.pageSelect;
     };
 
     $scope.$watch('$pagination.limit', function (newValue, oldValue) {
-      if(newValue === oldValue) {
+      if(isNaN(newValue) || isNaN(oldValue) || newValue === oldValue) {
         return;
       }
 
       // find closest page from previous min
-      self.page = Math.floor(((self.page * oldValue - oldValue) + newValue) / (isZero(newValue) ? 1 : newValue));
+      self.page = Math.floor(((self.page * oldValue - oldValue) + newValue) / (isPositive(newValue) ? newValue : 1));
       self.onPaginationChange();
+    });
+
+    $scope.$watch('$pagination.total', function (newValue, oldValue) {
+      if(isNaN(newValue) || newValue === oldValue) {
+        return;
+      }
+
+      if(self.page > self.pages()) {
+        self.last();
+      }
     });
   }
 
-  Controller.$inject = ['$attrs', '$scope'];
+  Controller.$inject = ['$attrs', '$mdUtil', '$scope'];
 
   return {
     bindToController: {
       boundaryLinks: '=?mdBoundaryLinks',
       label: '@?mdLabel',
+      disabled: '=ngDisabled',
       limit: '=mdLimit',
       page: '=mdPage',
       pageSelect: '=?mdPageSelect',
       onPaginate: '=?mdOnPaginate',
-      options: '=mdOptions',
+      limitOptions: '=?mdLimitOptions',
       total: '@mdTotal'
     },
     compile: compile,
